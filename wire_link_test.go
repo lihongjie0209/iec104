@@ -2,6 +2,7 @@ package iec104
 
 import (
 	"context"
+	"errors"
 	"net"
 	"testing"
 	"time"
@@ -124,6 +125,28 @@ func TestWireLinkRejectsInvalidOptions(t *testing.T) {
 		if err == nil {
 			t.Fatalf("accepted %#v", options)
 		}
+	}
+}
+
+func TestWireLinkStopPreservesCause(t *testing.T) {
+	t.Parallel()
+	left, right := net.Pipe()
+	defer right.Close()
+	link, err := NewWireLink(context.Background(), left, false, WireLinkOptions{
+		T1: time.Second, T2: time.Second, T3: time.Second, K: 1, W: 1,
+	}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cause := errors.New("test stop")
+	link.Stop(cause)
+	if !errors.Is(link.Err(), cause) {
+		t.Fatalf("Err()=%v", link.Err())
+	}
+	select {
+	case <-link.Done():
+	default:
+		t.Fatal("Done channel is still open after Stop")
 	}
 }
 

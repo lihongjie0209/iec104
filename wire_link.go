@@ -447,6 +447,15 @@ func (link *WireLink) stop(cause error) {
 	})
 }
 
+// Stop initiates non-blocking terminal shutdown with the supplied cause.
+// Close should be used afterwards when the caller must join link workers.
+func (link *WireLink) Stop(cause error) {
+	if cause == nil {
+		cause = ErrWireLinkClosed
+	}
+	link.stop(cause)
+}
+
 // Close cancels the link, closes its connection, and joins started workers.
 func (link *WireLink) Close(ctx context.Context) error {
 	link.stop(ErrWireLinkClosed)
