@@ -12,6 +12,7 @@ import (
 // information object. The three-byte information-object address is encoded by
 // the containing ASDU because SQ addressing can omit it.
 type WireInformationObject struct {
+	Address   uint32
 	Value     any
 	Quality   byte
 	Qualifier byte
