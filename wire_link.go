@@ -189,6 +189,11 @@ func (link *WireLink) Stats() WireLinkStats {
 	}
 }
 
+// Done is closed when the link reaches its terminal state.
+func (link *WireLink) Done() <-chan struct{} {
+	return link.ctx.Done()
+}
+
 func (link *WireLink) readLoop() {
 	defer link.wg.Done()
 	for {

@@ -147,5 +147,10 @@ func closeWireTestLinks(t *testing.T, links ...*WireLink) {
 		if err := link.Close(ctx); err != nil {
 			t.Errorf("close link: %v", err)
 		}
+		select {
+		case <-link.Done():
+		default:
+			t.Error("link Done channel is still open after Close")
+		}
 	}
 }
